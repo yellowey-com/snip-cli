@@ -17,6 +17,7 @@ func (i item) FilterValue() string { return i.snippet.Description + " " + i.snip
 type Model struct {
 	list     list.Model
 	Selected string
+	Execute  bool
 }
 
 func NewModel(snippets []storage.Snippet) Model {
@@ -47,8 +48,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Selected = selected.snippet.Command
 			}
 			return m, tea.Quit
+
+		case "ctrl+x":
+			if selected, ok := m.list.SelectedItem().(item); ok {
+				m.Selected = selected.snippet.Command
+				m.Execute = false
+			}
+			return m, tea.Quit
+
 		}
+
+	case tea.WindowSizeMsg:
+		h, v := msg.Width, msg.Height
+		m.list.SetSize(h-4, v-4)
+
 	}
+
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
 	return m, cmd

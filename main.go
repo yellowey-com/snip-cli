@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/atotto/clipboard"
 	tea "github.com/charmbracelet/bubbletea"
@@ -35,12 +36,25 @@ func main() {
 		}
 
 		if finalModel, ok := m.(ui.Model); ok && finalModel.Selected != "" {
-			err := clipboard.WriteAll(finalModel.Selected)
-			if err != nil {
-				fmt.Printf("Error copying to clipboard: %v\n", err)
-				os.Exit(1)
+			if finalModel.Execute {
+				fmt.Printf("Executing: %s\n\n", finalModel.Selected)
+				cmd := exec.Command("/bin/sh", "-c", finalModel.Selected)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				cmd.Stdin = os.Stdin
+
+				if err := cmd.Run(); err != nil {
+					fmt.Printf("\nExecution failed: %v\n", err)
+					os.Exit(1)
+				}
+			} else {
+				err := clipboard.WriteAll(finalModel.Selected)
+				if err != nil {
+					fmt.Printf("Error copying to clipboard: %v\n", err)
+					os.Exit(1)
+				}
+				fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
 			}
-			fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
 		}
 		return
 	}
