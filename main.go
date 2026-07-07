@@ -18,7 +18,14 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Println(content)
+		snippets := storage.ParseSnippetFile(content)
+
+		fmt.Printf("Parsed %d snippets from %s:\n", len(snippets), filename)
+		fmt.Println("==================================================")
+		for i, snip := range snippets {
+			fmt.Printf("[%d] Desc:    %s\n", i+1, snip.Description)
+			fmt.Printf("    Command: %s\n\n", snip.Command)
+		}
 		return
 	}
 
