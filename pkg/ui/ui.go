@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/yellowey-com/snip-cli/pkg/storage"
@@ -26,6 +27,14 @@ type Model struct {
 func NewModel(items []list.Item) Model {
 	l := list.New(items, list.NewDefaultDelegate(), 80, 20)
 	l.Title = "Select a snippet"
+
+	l.SetShowHelp(false)
+	l.SetShowStatusBar(false)
+
+	l.KeyMap.CursorUp = key.NewBinding(key.WithKeys("up", "k"))
+	l.KeyMap.CursorDown = key.NewBinding(key.WithKeys("down", "j"))
+	l.KeyMap.Filter = key.NewBinding(key.WithKeys("/"))
+	l.KeyMap.ClearFilter = key.NewBinding(key.WithKeys("esc"))
 
 	return Model{list: l}
 }
