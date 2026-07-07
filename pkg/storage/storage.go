@@ -2,6 +2,7 @@ package storage
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -59,4 +60,81 @@ func ParseSnippetFile(content string) []Snippet {
 		}
 	}
 	return list
+}
+
+func AppendSnippet(dirPath, filename, desc, command string) error {
+	filePath := dirPath + "/" + filename
+
+	snippetBlock := fmt.Sprintf("\n## %s\n\n%s\n", strings.TrimSpace(desc), strings.TrimSpace(command))
+
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	_, err = file.WriteString(snippetBlock)
+	return err
+}
+
+func RemoveSnippet(dirPath, filename, desc string) error {
+	content, err := ReadSnippet(dirPath, filename)
+	if err != nil {
+		return err
+	}
+
+	snippets := ParseSnippetFile(content)
+	var updated []Snippet
+
+	for _, snip := range snippets {
+		if snip.Description != desc {
+			updated = append(updated, snip)
+		}
+	}
+
+	return saveAllSnippets(dirPath, filename, updated)
+}
+
+func EditSnippet(dirPath, filename, desc, newCommand string) error {
+	content, err := ReadSnippet(dirPath, filename)
+	if err != nil {
+		return err
+	}
+
+	snippets := ParseSnippetFile(content)
+	changed := false
+
+	for i, snip := range snippets {
+		if snip.Description == desc {
+			snippets[i].Command = newCommand
+			changed = true
+			break
+		}
+	}
+
+	if !changed {
+		return fmt.Errorf("snippet with description '%s' not found", desc)
+	}
+
+	return saveAllSnippets(dirPath, filename, snippets)
+}
+
+func saveAllSnippets(dirPath, filename string, snippets []Snippet) error {
+	filePath := dirPath + "/" + filename
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	_, _ = writer.WriteString("# " + strings.TrimSuffix(filename, ".md") + " Snippets\n")
+
+	for _, snip := range snippets {
+		block := fmt.Sprintf("\n## %s\n\n%s\n", snip.Description, snip.Command)
+		_, _ = writer.WriteString(block)
+	}
+
+	return writer.Flush()
 }

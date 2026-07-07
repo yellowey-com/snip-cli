@@ -15,3 +15,7 @@ go build -o bin/snip
 ## Download dependencies defined in go.mod
 
 go mod download
+
+## Format all go files
+
+go fmt ./...

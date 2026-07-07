@@ -12,7 +12,56 @@ import (
 )
 
 func main() {
-	dirPath := "snippets"
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Error getting home directory: %v\n", err)
+		os.Exit(1)
+	}
+	dirPath := homeDir + "/.config/snip/snippets"
+	_ = os.MkdirAll(dirPath, 0o755)
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "add":
+			if len(os.Args) < 5 {
+				fmt.Println("Usage: snip add <file.md> <description> <command>")
+				os.Exit(1)
+			}
+			err := storage.AppendSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
+			if err != nil {
+				fmt.Printf("Error adding snippet: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Printf("✓ Snippet added to %s\n", os.Args[2])
+			return
+
+		case "remove":
+			if len(os.Args) < 4 {
+				fmt.Println("Usage: snip remove <file.md> <description>")
+				os.Exit(1)
+			}
+			err := storage.RemoveSnippet(dirPath, os.Args[2], os.Args[3])
+			if err != nil {
+				fmt.Printf("Error removing snippet: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Printf("✓ Snippet removed from %s\n", os.Args[2])
+			return
+
+		case "edit":
+			if len(os.Args) < 5 {
+				fmt.Println("Usage: snip edit <file.md> <description> <new_command>")
+				os.Exit(1)
+			}
+			err := storage.EditSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
+			if err != nil {
+				fmt.Printf("Error editing snippet: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Printf("✓ Snippet updated in %s\n", os.Args[2])
+			return
+		}
+	}
 
 	if len(os.Args) > 1 {
 		filename := os.Args[1]

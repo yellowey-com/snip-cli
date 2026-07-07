@@ -11,10 +11,12 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Interactive terminal UI (Fuzzy Search) using Bubble Tea (`v0.3.0`)
 - [x] System clipboard integration (copy on Enter) (`v0.4.0`)
 - [x] Built-in command execution (`v0.5.0`)
+- [x] Dynamic snippet management (`add`, `edit`, `remove`) (`v0.6.0`)
 
 ## Roadmap
 
-- [ ] Dynamic snippet management (`add`, `edit`, `remove`)
+- [ ] Global search across all category files when no argument is passed (`v0.7.0`)
+- [ ] Direct execution profile variables
 
 ## Installation & Usage (Development)
 
