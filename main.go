@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/atotto/clipboard"
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/yellowey-com/snip-cli/pkg/storage"
 	"github.com/yellowey-com/snip-cli/pkg/ui"
@@ -63,6 +64,8 @@ func main() {
 		}
 	}
 
+	var items []list.Item
+
 	if len(os.Args) > 1 {
 		filename := os.Args[1]
 		content, err := storage.ReadSnippet(dirPath, filename)
@@ -72,52 +75,59 @@ func main() {
 		}
 
 		snippets := storage.ParseSnippetFile(content)
-		if len(snippets) == 0 {
-			fmt.Printf("No snippets found in file '%s'.\n", filename)
-			os.Exit(0)
+		for _, snip := range snippets {
+			items = append(items, ui.NewItem(snip, filename))
 		}
-
-		p := tea.NewProgram(ui.NewModel(snippets), tea.WithAltScreen())
-		m, err := p.Run()
+	} else {
+		files, err := storage.ListSnippets(dirPath)
 		if err != nil {
-			fmt.Printf("Error running UI: %v\n", err)
+			fmt.Printf("Error: Could not read directory: %v\n", err)
 			os.Exit(1)
 		}
 
-		if finalModel, ok := m.(ui.Model); ok && finalModel.Selected != "" {
-			if finalModel.Execute {
-				fmt.Printf("Executing: %s\n\n", finalModel.Selected)
-				cmd := exec.Command("/bin/sh", "-c", finalModel.Selected)
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				cmd.Stdin = os.Stdin
-
-				if err := cmd.Run(); err != nil {
-					fmt.Printf("\nExecution failed: %v\n", err)
-					os.Exit(1)
-				}
-			} else {
-				err := clipboard.WriteAll(finalModel.Selected)
-				if err != nil {
-					fmt.Printf("Error copying to clipboard: %v\n", err)
-					os.Exit(1)
-				}
-				fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
+		for _, file := range files {
+			content, err := storage.ReadSnippet(dirPath, file)
+			if err != nil {
+				continue
+			}
+			snippets := storage.ParseSnippetFile(content)
+			for _, snip := range snippets {
+				items = append(items, ui.NewItem(snip, file))
 			}
 		}
-		return
 	}
 
-	files, err := storage.ListSnippets(dirPath)
+	if len(items) == 0 {
+		fmt.Println("No snippets found. Use 'snip add <file.md> <desc> <cmd>' to add some.")
+		os.Exit(0)
+	}
+
+	p := tea.NewProgram(ui.NewModel(items), tea.WithAltScreen())
+	m, err := p.Run()
 	if err != nil {
-		fmt.Printf("Error: Could not read directory: %v\n", err)
+		fmt.Printf("Error running UI: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Available snippet categories:")
-	fmt.Println("----------------------------")
+	if finalModel, ok := m.(ui.Model); ok && finalModel.Selected != "" {
+		if finalModel.Execute {
+			fmt.Printf("Executing: %s\n\n", finalModel.Selected)
+			cmd := exec.Command("/bin/sh", "-c", finalModel.Selected)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
 
-	for _, file := range files {
-		fmt.Printf("- %s\n", file)
+			if err := cmd.Run(); err != nil {
+				fmt.Printf("\nExecution failed: %v\n", err)
+				os.Exit(1)
+			}
+		} else {
+			err := clipboard.WriteAll(finalModel.Selected)
+			if err != nil {
+				fmt.Printf("Error copying to clipboard: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
+		}
 	}
 }

@@ -7,12 +7,15 @@ import (
 )
 
 type item struct {
-	snippet storage.Snippet
+	snippet  storage.Snippet
+	category string
 }
 
 func (i item) Title() string       { return i.snippet.Description }
-func (i item) Description() string { return i.snippet.Command }
-func (i item) FilterValue() string { return i.snippet.Description + " " + i.snippet.Command }
+func (i item) Description() string { return "[" + i.category + "] " + i.snippet.Command }
+func (i item) FilterValue() string {
+	return i.snippet.Description + " " + i.snippet.Command + " " + i.category
+}
 
 type Model struct {
 	list     list.Model
@@ -20,16 +23,18 @@ type Model struct {
 	Execute  bool
 }
 
-func NewModel(snippets []storage.Snippet) Model {
-	var items []list.Item
-	for _, snip := range snippets {
-		items = append(items, item{snippet: snip})
-	}
-
+func NewModel(items []list.Item) Model {
 	l := list.New(items, list.NewDefaultDelegate(), 80, 20)
-	l.Title = "Select as snippet"
+	l.Title = "Select a snippet"
 
 	return Model{list: l}
+}
+
+func NewItem(snippet storage.Snippet, category string) list.Item {
+	return item{
+		snippet:  snippet,
+		category: category,
+	}
 }
 
 func (m Model) Init() tea.Cmd {
