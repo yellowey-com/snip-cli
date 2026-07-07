@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/atotto/clipboard"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/yellowey-com/snip-cli/pkg/storage"
 	"github.com/yellowey-com/snip-cli/pkg/ui"
@@ -34,7 +35,12 @@ func main() {
 		}
 
 		if finalModel, ok := m.(ui.Model); ok && finalModel.Selected != "" {
-			fmt.Println(finalModel.Selected)
+			err := clipboard.WriteAll(finalModel.Selected)
+			if err != nil {
+				fmt.Printf("Error copying to clipboard: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
 		}
 		return
 	}
