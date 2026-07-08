@@ -47,7 +47,7 @@ func ParseSnippetFile(content string) []Snippet {
 		line := strings.TrimSpace(scanner.Text())
 
 		if after, found := strings.CutPrefix(line, "##"); found {
-			currentDesc = after
+			currentDesc = strings.TrimSpace(after)
 			continue
 		}
 
