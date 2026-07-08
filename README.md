@@ -14,6 +14,8 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Dynamic snippet management (`add`, `edit`, `remove`) (`v0.6.0`)
 - [x] Global search across all category files when no argument is passed (`v0.7.0`)
 - [x] Hide all default shortcuts and help footer from the UI (`v0.7.1`)
+- [x] Interactive add/edit/delete snippets via in-picker modal forms (`v0.8.0`)
+- [x] Centralized keybindings + contextual help footer (`v0.8.1`)
 
 ## Roadmap
 
