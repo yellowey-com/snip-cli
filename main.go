@@ -13,121 +13,89 @@ import (
 )
 
 func main() {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Printf("Error getting home directory: %v\n", err)
-		os.Exit(1)
-	}
+	homeDir, _ := os.UserHomeDir()
 	dirPath := homeDir + "/.config/snip/snippets"
 	_ = os.MkdirAll(dirPath, 0o755)
 
+	var filterQuery string
+
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
+		case "find":
+			if len(os.Args) < 3 {
+				fmt.Println("Usage: snip find <query>")
+				os.Exit(1)
+			}
+			filterQuery = os.Args[2]
 		case "add":
 			if len(os.Args) < 5 {
 				fmt.Println("Usage: snip add <file.md> <description> <command>")
 				os.Exit(1)
 			}
-			err := storage.AppendSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
-			if err != nil {
-				fmt.Printf("Error adding snippet: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Printf("✓ Snippet added to %s\n", os.Args[2])
+			storage.AppendSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
+			fmt.Printf("✓ Snippet added\n")
 			return
-
 		case "remove":
 			if len(os.Args) < 4 {
 				fmt.Println("Usage: snip remove <file.md> <description>")
 				os.Exit(1)
 			}
-			err := storage.RemoveSnippet(dirPath, os.Args[2], os.Args[3])
-			if err != nil {
-				fmt.Printf("Error removing snippet: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Printf("✓ Snippet removed from %s\n", os.Args[2])
+			storage.RemoveSnippet(dirPath, os.Args[2], os.Args[3])
+			fmt.Printf("✓ Snippet removed\n")
 			return
-
 		case "edit":
 			if len(os.Args) < 5 {
 				fmt.Println("Usage: snip edit <file.md> <description> <new_command>")
 				os.Exit(1)
 			}
-			err := storage.EditSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
-			if err != nil {
-				fmt.Printf("Error editing snippet: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Printf("✓ Snippet updated in %s\n", os.Args[2])
+			storage.EditSnippet(dirPath, os.Args[2], os.Args[3], os.Args[4])
+			fmt.Printf("✓ Snippet updated\n")
 			return
 		}
 	}
 
 	var items []list.Item
 
-	if len(os.Args) > 1 {
+	if filterQuery == "" && len(os.Args) > 1 {
 		filename := os.Args[1]
 		content, err := storage.ReadSnippet(dirPath, filename)
 		if err != nil {
-			fmt.Printf("Error: Could not read file '%s'. Make sure it exists.\n", filename)
+			fmt.Printf("Error: File '%s' not found.\n", filename)
 			os.Exit(1)
 		}
-
-		snippets := storage.ParseSnippetFile(content)
-		for _, snip := range snippets {
+		for _, snip := range storage.ParseSnippetFile(content) {
 			items = append(items, ui.NewItem(snip, filename))
 		}
 	} else {
-		files, err := storage.ListSnippets(dirPath)
-		if err != nil {
-			fmt.Printf("Error: Could not read directory: %v\n", err)
-			os.Exit(1)
-		}
-
+		files, _ := storage.ListSnippets(dirPath)
 		for _, file := range files {
-			content, err := storage.ReadSnippet(dirPath, file)
-			if err != nil {
-				continue
-			}
-			snippets := storage.ParseSnippetFile(content)
-			for _, snip := range snippets {
+			content, _ := storage.ReadSnippet(dirPath, file)
+			for _, snip := range storage.ParseSnippetFile(content) {
 				items = append(items, ui.NewItem(snip, file))
 			}
 		}
 	}
 
 	if len(items) == 0 {
-		fmt.Println("No snippets found. Use 'snip add <file.md> <desc> <cmd>' to add some.")
+		fmt.Println("No snippets found.")
 		os.Exit(0)
 	}
 
-	p := tea.NewProgram(ui.NewModel(items, dirPath), tea.WithAltScreen())
+	p := tea.NewProgram(ui.NewModel(items, dirPath, filterQuery), tea.WithAltScreen())
 	m, err := p.Run()
 	if err != nil {
-		fmt.Printf("Error running UI: %v\n", err)
+		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
 	if finalModel, ok := m.(ui.Model); ok && finalModel.Selected != "" {
 		if finalModel.Execute {
-			fmt.Printf("Executing: %s\n\n", finalModel.Selected)
 			cmd := exec.Command("/bin/sh", "-c", finalModel.Selected)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Stdin = os.Stdin
-
-			if err := cmd.Run(); err != nil {
-				fmt.Printf("\nExecution failed: %v\n", err)
-				os.Exit(1)
-			}
+			cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
+			cmd.Run()
 		} else {
-			err := clipboard.WriteAll(finalModel.Selected)
-			if err != nil {
-				fmt.Printf("Error copying to clipboard: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Printf("✓ Copied to clipboard: %s\n", finalModel.Selected)
+			clipboard.WriteAll(finalModel.Selected)
+			fmt.Printf("✓ Copied: %s\n", finalModel.Selected)
 		}
 	}
 }

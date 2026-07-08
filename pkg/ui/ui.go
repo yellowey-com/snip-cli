@@ -43,7 +43,7 @@ type Model struct {
 	Execute  bool
 }
 
-func NewModel(items []list.Item, dirPath string) Model {
+func NewModel(items []list.Item, dirPath string, filterQuery string) Model {
 	l := list.New(items, itemDelegate{}, 80, 20)
 	l.Title = ""
 	l.SetShowStatusBar(false)
@@ -54,6 +54,10 @@ func NewModel(items []list.Item, dirPath string) Model {
 	l.KeyMap.CursorDown = key.NewBinding(key.WithKeys("down", "j"))
 	l.KeyMap.Filter = key.NewBinding(key.WithKeys("/"))
 	l.KeyMap.ClearFilter = key.NewBinding(key.WithKeys("esc"))
+
+	if filterQuery != "" {
+		l.SetFilterText(filterQuery)
+	}
 
 	h := help.New()
 	h.ShowAll = true

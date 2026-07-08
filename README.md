@@ -16,12 +16,12 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Hide all default shortcuts and help footer from the UI (`v0.7.1`)
 - [x] Interactive add/edit/delete snippets via in-picker modal forms (`v0.8.0`)
 - [x] Centralized keybindings + contextual help footer (`v0.8.1`)
+- [x] Fuzzy search directly from terminal arguments via `snip find "query"` (`v0.9.0`)
 
 ## Roadmap
 
 - [ ] Inline placeholders to inject dynamic values before running a command
 - [ ] Direct execution profile variables
-- [ ] Fuzzy search directly from terminal arguments via `snip find "query"`
 - [ ] Auto sync snippets with a remote git repository
 
 ## Installation & Usage (Development)
