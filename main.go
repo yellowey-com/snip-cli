@@ -102,7 +102,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	p := tea.NewProgram(ui.NewModel(items), tea.WithAltScreen())
+	p := tea.NewProgram(ui.NewModel(items, dirPath), tea.WithAltScreen())
 	m, err := p.Run()
 	if err != nil {
 		fmt.Printf("Error running UI: %v\n", err)
