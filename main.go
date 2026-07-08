@@ -8,6 +8,7 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/yellowey-com/snip-cli/pkg/cli"
 	"github.com/yellowey-com/snip-cli/pkg/storage"
 	"github.com/yellowey-com/snip-cli/pkg/ui"
 )
@@ -21,6 +22,13 @@ func main() {
 
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
+		case "run":
+			if len(os.Args) < 3 {
+				fmt.Printf("Usage: snip run <description>")
+				os.Exit(1)
+			}
+			cli.RunCommand(dirPath, os.Args[2])
+			return
 		case "find":
 			if len(os.Args) < 3 {
 				fmt.Println("Usage: snip find <query>")
