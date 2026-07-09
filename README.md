@@ -19,12 +19,18 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Fuzzy search directly from terminal arguments via `snip find "query"` (`v0.9.0`)
 - [x] Execute snippets directly from CLI via `snip run <description>` (`v0.10.0`)
 - [x] Full native Zsh autocompletion with multi-word description support (`v0.11.0`)
+- [x] Inline placeholders to inject dynamic values before running a command (`v0.12.0`)
 
 ## Roadmap
 
-- [ ] Inline placeholders to inject dynamic values before running a command
 - [ ] Direct execution profile variables
 - [ ] Auto sync snippets with a remote git repository
+- [ ] Bash and Fish shell autocompletion support
+- [ ] Export snippets to JSON/YAML format and import from standard Cheat sheets
+- [ ] Configurable keybindings and theme customization via `config.toml`
+- [ ] Grouping and execution filtering by user-defined tags/labels
+- [ ] Stat tracking (most used snippets sorted at the top)
+- [ ] Custom validation hooks for inputs in the modal forms
 
 ## Installation & Usage (Development)
 

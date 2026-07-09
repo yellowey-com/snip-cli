@@ -54,19 +54,25 @@ func FindCommand(dirPath, query string) {
 	}
 }
 
-func RunCommand(dirPath, descQuery string) {
+func RunCommand(dirPath, query string) {
 	snippets, err := loadAllSnippets(dirPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	descQuery = strings.ToLower(descQuery)
+	query = strings.ToLower(query)
 	for _, s := range snippets {
-		if strings.Contains(strings.ToLower(s.Description), descQuery) {
-			fmt.Printf("Running: %s\n", s.Command)
+		if strings.Contains(strings.ToLower(s.Description), query) {
+			finalCommand, err := ResolvePlaceholders(s.Command)
+			if err != nil {
+				fmt.Println("\n✕ Execution cancelled")
+				return
+			}
 
-			cmd := exec.Command("sh", "-c", s.Command)
+			fmt.Printf("Running: %s\n", finalCommand)
+
+			cmd := exec.Command("sh", "-c", finalCommand)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Stdin = os.Stdin
