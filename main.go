@@ -22,9 +22,21 @@ func main() {
 
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
+		case "--list":
+			files, _ := storage.ListSnippets(dirPath)
+			for _, file := range files {
+				content, _ := storage.ReadSnippet(dirPath, file)
+				for _, snip := range storage.ParseSnippetFile(content) {
+					fmt.Println(snip.Description)
+				}
+			}
+			return
+		case "completion":
+			fmt.Println("find run add remove edit")
+			return
 		case "run":
 			if len(os.Args) < 3 {
-				fmt.Printf("Usage: snip run <description>")
+				fmt.Println("Usage: snip run <description>")
 				os.Exit(1)
 			}
 			cli.RunCommand(dirPath, os.Args[2])

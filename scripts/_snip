@@ -1,0 +1,30 @@
+#compdef snip
+
+_snip() {
+    local -a commands
+    commands=(
+        'run:Execute snippet by description'
+        'find:Search snippets by query'
+        'add:Add new snippet'
+        'remove:Remove snippet'
+        'edit:Edit snippet command'
+    )
+
+    _arguments \
+        '1: :->cmd' \
+        '*: :->args'
+
+    case "$words[2]" in
+        run|find)
+            local -a snippets
+            snippets=(${(f)"$(snip --list 2>/dev/null | sed 's/ /\\ /g')"})
+            
+            if (( ${#snippets} > 0 )); then
+                _arguments "*:snippets:($snippets)"
+            fi
+            ;;
+        *)
+            _describe 'snip commands' commands
+            ;;
+    esac
+}
