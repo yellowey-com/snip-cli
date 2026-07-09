@@ -21,7 +21,7 @@ func (m Model) updateList(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, tea.Quit
 
-		case "ctrl+x":
+		case "x":
 			if s, ok := m.list.SelectedItem().(item); ok {
 				m.Selected = s.snippet.Command
 				m.Execute = true

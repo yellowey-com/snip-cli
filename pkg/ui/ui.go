@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -19,28 +20,50 @@ const (
 	stateConfirm
 )
 
+var (
+	magenta = lipgloss.Color("#cba6f7")
+	subtext = lipgloss.Color("#a6adc8")
+	overlay = lipgloss.Color("#6c7086")
+	surface = lipgloss.Color("#313244")
+
+	appStyle = lipgloss.NewStyle().Padding(1, 2)
+
+	headerTitleStyle = lipgloss.NewStyle().Foreground(magenta).Bold(true)
+	headerCountStyle = lipgloss.NewStyle().Foreground(subtext)
+	headerLineStyle  = lipgloss.NewStyle().Foreground(surface)
+	footerStyle      = lipgloss.NewStyle().Foreground(overlay)
+	footerKeyStyle   = lipgloss.NewStyle().Foreground(magenta)
+
+	activeTitleStyle = lipgloss.NewStyle().Foreground(magenta).Bold(true)
+	activeDescStyle  = lipgloss.NewStyle().Foreground(overlay)
+
+	inactiveTitleStyle = lipgloss.NewStyle().Foreground(subtext)
+	inactiveDescStyle  = lipgloss.NewStyle().Foreground(surface)
+
+	activeBorder = lipgloss.NewStyle().
+			Border(lipgloss.Border{Left: "┃"}, false, false, false, true).
+			BorderForeground(magenta).
+			PaddingLeft(1)
+
+	inactiveBorder = lipgloss.NewStyle().PaddingLeft(2)
+)
+
 type Model struct {
-	list    list.Model
-	dirPath string
-	state   uiState
-
-	descInput  textinput.Model
-	cmdInput   textinput.Model
-	focusIndex int
-	formIsEdit bool
-
+	list        list.Model
+	dirPath     string
+	state       uiState
+	descInput   textinput.Model
+	cmdInput    textinput.Model
+	focusIndex  int
+	formIsEdit  bool
 	targetItem  item
 	targetIndex int
-
-	help help.Model
-
-	errMsg string
-
-	width  int
-	height int
-
-	Selected string
-	Execute  bool
+	help        help.Model
+	errMsg      string
+	width       int
+	height      int
+	Selected    string
+	Execute     bool
 }
 
 func NewModel(items []list.Item, dirPath string, filterQuery string) Model {
@@ -96,18 +119,77 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	keyMap := GetKeys(m.state)
-
-	helpView := m.help.View(keyMap)
-
 	switch m.state {
 	case stateForm:
-		return m.renderModal(m.formView() + "\n\n" + helpView)
+		return m.renderModal(m.formView())
 	case stateConfirm:
-		return m.renderModal(m.confirmView() + "\n\n" + helpView)
+		return m.renderModal(m.confirmView())
 	default:
-		return "\n" + m.list.View() + "\n" + helpView
+		return m.listView()
 	}
+}
+
+func (m Model) listView() string {
+	var s strings.Builder
+	totalItems := len(m.list.VisibleItems())
+
+	title := headerTitleStyle.Render("snip")
+	count := headerCountStyle.Render(fmt.Sprintf("%d snippets", totalItems))
+	filterMode := headerTitleStyle.Render("all")
+	if m.list.FilterState() == list.Filtering {
+		filterMode = headerTitleStyle.Render("searching")
+	}
+	filterStr := headerCountStyle.Render("filter: ") + filterMode
+
+	headerWidth := m.width - 4
+	if headerWidth < 40 {
+		headerWidth = 60
+	}
+
+	leftHeader := fmt.Sprintf("%s  •  %s ", title, count)
+	rightHeader := fmt.Sprintf(" %s", filterStr)
+	lineWidth := headerWidth - lipgloss.Width(leftHeader) - lipgloss.Width(rightHeader)
+
+	var lineStr string
+	if lineWidth > 0 {
+		lineStr = headerLineStyle.Render(strings.Repeat("─", lineWidth))
+	}
+
+	s.WriteString(leftHeader + lineStr + rightHeader + "\n\n")
+
+	if totalItems == 0 {
+		s.WriteString(inactiveTitleStyle.Render("  No snippets found.") + "\n")
+	} else {
+		cursor := m.list.Index()
+		for i, rawItem := range m.list.VisibleItems() {
+			si := rawItem.(item)
+
+			var itemStr string
+			if i == cursor {
+				titleLine := activeTitleStyle.Render(si.snippet.Description)
+				descLine := activeDescStyle.Render(fmt.Sprintf("[%s] %s", si.category, si.snippet.Command))
+				itemStr = activeBorder.Render(fmt.Sprintf("%s\n%s", titleLine, descLine))
+			} else {
+				titleLine := inactiveTitleStyle.Render(si.snippet.Description)
+				descLine := inactiveDescStyle.Render(fmt.Sprintf("[%s] %s", si.category, si.snippet.Command))
+				itemStr = inactiveBorder.Render(fmt.Sprintf("%s\n%s", titleLine, descLine))
+			}
+			s.WriteString(itemStr + "\n\n")
+		}
+	}
+
+	s.WriteString(headerLineStyle.Render(strings.Repeat("─", headerWidth)) + "\n")
+
+	nav := fmt.Sprintf("%s navigate", footerKeyStyle.Render("↑/↓"))
+	run := fmt.Sprintf("%s run", footerKeyStyle.Render("enter"))
+	execute := fmt.Sprintf("%s execute", footerKeyStyle.Render("x"))
+	filt := fmt.Sprintf("%s filter", footerKeyStyle.Render("/"))
+	quit := fmt.Sprintf("%s quit", footerKeyStyle.Render("ctrl+c"))
+
+	footer := fmt.Sprintf("%-20s | %-16s | %-16s | %-16s | %s", nav, run, execute, filt, quit)
+	s.WriteString(footerStyle.Render(footer))
+
+	return appStyle.Render(s.String())
 }
 
 func (m Model) renderModal(content string) string {

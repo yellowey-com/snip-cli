@@ -30,7 +30,7 @@ var baseKeyMap = keyMap{
 	Up:      key.NewBinding(key.WithKeys("up", "k"), key.WithHelp("↑/k", "up")),
 	Down:    key.NewBinding(key.WithKeys("down", "j"), key.WithHelp("↓/j", "down")),
 	Select:  key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "copy")),
-	Execute: key.NewBinding(key.WithKeys("ctrl+x"), key.WithHelp("ctrl+x", "execute")),
+	Execute: key.NewBinding(key.WithKeys("x"), key.WithHelp("x", "execute")),
 	Add:     key.NewBinding(key.WithKeys("a"), key.WithHelp("a", "add")),
 	Edit:    key.NewBinding(key.WithKeys("e"), key.WithHelp("e", "edit")),
 	Delete:  key.NewBinding(key.WithKeys("d"), key.WithHelp("d", "delete")),

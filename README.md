@@ -21,6 +21,7 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Full native Zsh autocompletion with multi-word description support (`v0.11.0`)
 - [x] Inline placeholders to inject dynamic values before running a command (`v0.12.0`)
 - [x] Clean up and refactor command line argument parsing (`v0.12.1`)
+- [x] Redesign interactive TUI into a minimalist, boxed layout (`v0.12.2`)
 
 ## Roadmap
 
