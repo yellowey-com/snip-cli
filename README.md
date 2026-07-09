@@ -18,6 +18,7 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Centralized keybindings + contextual help footer (`v0.8.1`)
 - [x] Fuzzy search directly from terminal arguments via `snip find "query"` (`v0.9.0`)
 - [x] Execute snippets directly from CLI via `snip run <description>` (`v0.10.0`)
+- [x] Full native Zsh autocompletion with multi-word description support (`v0.11.0`)
 
 ## Roadmap
 
