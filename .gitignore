@@ -5,8 +5,8 @@
 *.so
 *.dylib
 bin/
-snip
-snip-cli
+/snip
+/snip-cli
 
 # Test binary, built by `go test -c`
 *.test
