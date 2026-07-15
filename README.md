@@ -22,6 +22,8 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Inline placeholders to inject dynamic values before running a command (`v0.12.0`)
 - [x] Clean up and refactor command line argument parsing (`v0.12.1`)
 - [x] Redesign interactive TUI into a minimalist, boxed layout (`v0.12.2`)
+- [x] Implement CLI command to rebuild and restart completion cache (`v0.13.0`)
+- [x] Standardize project structure to `cmd/snip` for idiomatic Go distribution (`v0.14.0`)
 
 ## Roadmap
 
