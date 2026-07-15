@@ -10,7 +10,17 @@ _snip() {
     'run:Execute snippet by description'
     'reload:Rebuild and restart'
   )
-  _describe 'snip commands' commands
+
+  case "$words[2]" in
+    run|edit|remove|rm)
+      local -a descriptions
+      descriptions=(${(f)"$(snip _list-descriptions 2>/dev/null)"})
+      _describe 'snippet' descriptions
+      ;;
+    *)
+      _describe 'snip commands' commands
+      ;;
+  esac
 }
 
 _snip "$@"

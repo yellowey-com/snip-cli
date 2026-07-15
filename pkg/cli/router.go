@@ -13,14 +13,8 @@ func Execute(args []string, dirPath string) (filterQuery string, filename string
 	}
 
 	switch args[0] {
-	case "--list":
-		files, _ := storage.ListSnippets(dirPath)
-		for _, file := range files {
-			content, _ := storage.ReadSnippet(dirPath, file)
-			for _, snip := range storage.ParseSnippetFile(content) {
-				fmt.Println(snip.Description)
-			}
-		}
+	case "--list", "_list-descriptions":
+		printDescriptions(dirPath)
 		return "", "", false
 
 	case "completion":
@@ -71,5 +65,21 @@ func Execute(args []string, dirPath string) (filterQuery string, filename string
 
 	default:
 		return "", args[0], true
+	}
+}
+
+func printDescriptions(dirPath string) {
+	files, err := storage.ListSnippets(dirPath)
+	if err != nil {
+		return
+	}
+	for _, file := range files {
+		content, err := storage.ReadSnippet(dirPath, file)
+		if err != nil {
+			continue
+		}
+		for _, snip := range storage.ParseSnippetFile(content) {
+			fmt.Println(snip.Description)
+		}
 	}
 }

@@ -24,12 +24,12 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Redesign interactive TUI into a minimalist, boxed layout (`v0.12.2`)
 - [x] Implement CLI command to rebuild and restart completion cache (`v0.13.0`)
 - [x] Standardize project structure to `cmd/snip` for idiomatic Go distribution (`v0.14.0`)
+- [x] Bash and Fish shell autocompletion support (`v0.15.0`)
 
 ## Roadmap
 
 - [ ] Direct execution profile variables
 - [ ] Auto sync snippets with a remote git repository
-- [ ] Bash and Fish shell autocompletion support
 - [ ] Export snippets to JSON/YAML format and import from standard Cheat sheets
 - [ ] Configurable keybindings and theme customization via `config.toml`
 - [ ] Grouping and execution filtering by user-defined tags/labels

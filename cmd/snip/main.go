@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/atotto/clipboard"
@@ -24,18 +25,19 @@ func main() {
 }
 
 func reloadSelf() {
-	build := exec.Command("go", "build", "-o", "snip", "main.go")
+	build := exec.Command("go", "install", "./cmd/snip")
 	build.Stdout, build.Stderr = os.Stdout, os.Stderr
 	if err := build.Run(); err != nil {
 		fmt.Printf("Build failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	binPath, err := filepath.Abs("snip")
+	gopath, err := exec.Command("go", "env", "GOPATH").Output()
 	if err != nil {
-		fmt.Printf("Error resolving binary path: %v\n", err)
+		fmt.Printf("Error resolving GOPATH: %v\n", err)
 		os.Exit(1)
 	}
+	binPath := filepath.Join(strings.TrimSpace(string(gopath)), "bin", "snip")
 
 	args := append([]string{binPath}, os.Args[2:]...)
 	if err := syscall.Exec(binPath, args, os.Environ()); err != nil {

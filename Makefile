@@ -7,7 +7,7 @@ build:
 	go build -o $(BINARY_NAME) ./$(BUILD_DIR)
 
 install:
-	go build -o $(HOME)/go/bin/$(BINARY_NAME) ./$(BUILD_DIR)
+	go install ./$(BUILD_DIR)
 
 clean:
 	rm -f $(BINARY_NAME)
