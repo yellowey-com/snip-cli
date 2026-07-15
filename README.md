@@ -25,6 +25,7 @@ A fast, lightweight CLI snippet and cheat sheet manager written in Go. Keep your
 - [x] Implement CLI command to rebuild and restart completion cache (`v0.13.0`)
 - [x] Standardize project structure to `cmd/snip` for idiomatic Go distribution (`v0.14.0`)
 - [x] Bash and Fish shell autocompletion support (`v0.15.0`)
+- [x] Official Homebrew formula distribution (`v0.16.0`)
 
 ## Roadmap
 
