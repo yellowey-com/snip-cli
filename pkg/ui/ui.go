@@ -125,6 +125,9 @@ func (m Model) View() string {
 	case stateConfirm:
 		return m.renderModal(m.confirmView())
 	default:
+		if len(m.list.Items()) == 0 {
+			return RenderEmptyState(m.width, m.height)
+		}
 		return m.listView()
 	}
 }

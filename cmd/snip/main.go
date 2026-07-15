@@ -77,11 +77,6 @@ func RunUI() {
 		}
 	}
 
-	if len(items) == 0 {
-		fmt.Println("No snippets found.")
-		os.Exit(0)
-	}
-
 	p := tea.NewProgram(ui.NewModel(items, dirPath, filterQuery), tea.WithAltScreen())
 	m, err := p.Run()
 	if err != nil {
