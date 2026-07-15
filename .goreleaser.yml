@@ -37,3 +37,16 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+brews:
+  - name: snip
+    repository:
+      owner: yellowey-com
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/yellowey-com/snip-cli"
+    description: "A fast, lightweight CLI snippet manager."
+    license: "MIT"
+    install: |
+      bin.install "snip"
