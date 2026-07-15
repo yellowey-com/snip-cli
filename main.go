@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"syscall"
 
 	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/list"
@@ -14,6 +16,35 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "reload" {
+		reloadSelf()
+		return
+	}
+	RunUI()
+}
+
+func reloadSelf() {
+	build := exec.Command("go", "build", "-o", "snip", "main.go")
+	build.Stdout, build.Stderr = os.Stdout, os.Stderr
+	if err := build.Run(); err != nil {
+		fmt.Printf("Build failed: %v\n", err)
+		os.Exit(1)
+	}
+
+	binPath, err := filepath.Abs("snip")
+	if err != nil {
+		fmt.Printf("Error resolving binary path: %v\n", err)
+		os.Exit(1)
+	}
+
+	args := append([]string{binPath}, os.Args[2:]...)
+	if err := syscall.Exec(binPath, args, os.Environ()); err != nil {
+		fmt.Printf("Exec failed: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func RunUI() {
 	homeDir, _ := os.UserHomeDir()
 	dirPath := homeDir + "/.config/snip/snippets"
 	_ = os.MkdirAll(dirPath, 0o755)

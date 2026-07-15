@@ -24,7 +24,7 @@ func Execute(args []string, dirPath string) (filterQuery string, filename string
 		return "", "", false
 
 	case "completion":
-		fmt.Println("find run add remove edit")
+		fmt.Println("find run add remove edit reload")
 		return "", "", false
 
 	case "run":
